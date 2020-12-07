@@ -32,14 +32,13 @@ def login():
 		password = request.form['password']
 		# Check if account exists using MySQL
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM Customers WHERE email = % s AND password = % s', (email, password,))
+		cursor.execute('SELECT * FROM Customers WHERE email = % s AND password = % s AND customer_id', (email, password,))
 		# Fetch one record and return result
 		account = cursor.fetchone()
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
 			session['loggedin'] = True
-	#		session['customer_id'] = account['id']
 			session['password'] = account['password']
 			session['email'] = account['email']
 			# Redirect to home page
@@ -87,22 +86,39 @@ def home():
 		return render_template('home.html', email=session['email'])
 	return redirect(url_for('login'))
 
-@app.route('/shop')
-def shop():
-	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.execute('SELECT * FROM Products')
-	data = cursor.fetchall()
-	return render_template('shop.html', data=data)
-
 #This will be the profile page, only accessible for loggedin users
 @app.route('/profile')
 def profile():
 	if 'loggedin' in session:
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM Customers WHERE customer_id = % s', (session['id'],))
+		cursor.execute('SELECT * FROM Customers WHERE email = % s', (session['email'],))
 		account = cursor.fetchone()
 		return render_template('profile.html', account=account)
 	return redirect(url_for('login'))
+
+@app.route('/shop')
+def shop():
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT * FROM Products')
+	prodData = cursor.fetchall()
+	return render_template('shop.html', prodData=prodData)
+
+@app.route('/cart')
+def cart():
+	#cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	#prod = request.form['prod_id']
+	#print (prod)
+	return render_template('cart.html')
+#def addToCart():
+#def removeFromCart():
+
+@app.route("/productDescription")
+def productDescription():
+	prod_id = request.form['prod_id']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT * FROM Products WHERE prod_id = ' + prod_id)
+	productData = cursor.fetchall()
+	return render_template('productDescription.html')
 
 if __name__ == "__main__":
 	app.run()

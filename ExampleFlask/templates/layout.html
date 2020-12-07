@@ -6,6 +6,7 @@
 	</head>
 
 	<body class="loggedin">
+
 		<nav class="navtop">
 			<div>
 				<h1>Website Title</h1>
@@ -13,8 +14,18 @@
 				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
 				<a href="{{ url_for('shop') }}"><i class="fas fa-sign-out-alt"></i>Shop</a>
+				<a href="{{ url_for('cart') }}"><i class="fas fa-sign-out-alt"></i>Cart</a>
 			</div>
 		</nav>
+		
+		<div class="search-container">
+    			<form action="/action_page.php">
+      			<input type="text" placeholder="Search.." name="search">
+      		<button type="submit"><i class="fa fa-search"></i></button>
+		</div>
+    </form>
+  </div>
+
 		<div class="content">
 			{% block content %}{% endblock %}
 		</div>
