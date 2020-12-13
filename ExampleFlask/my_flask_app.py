@@ -101,6 +101,7 @@ def shop():
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 	cursor.execute('SELECT * FROM Products')
 	prodData = cursor.fetchall()
+#	prodData = parse(prodData)
 	return render_template('shop.html', prodData=prodData)
 
 @app.route('/cart')
@@ -114,11 +115,28 @@ def cart():
 
 @app.route("/productDescription")
 def productDescription():
-	prod_id = request.form['prod_id']
+#	prod_id = request.form['prod_id']
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.execute('SELECT * FROM Products WHERE prod_id = ' + prod_id)
+#	cursor.execute('SELECT * FROM Products WHERE prod_id')
+	cursor.execute('SELECT * FROM Products WHERE prod_id = 1')
 	productData = cursor.fetchall()
-	return render_template('productDescription.html')
+	return render_template('productDescription.html', data = productData)
+
+#WTF IS THIS?????
+def parse(data):
+    ans = []
+    i = 0
+    while i < len(data):
+        curr = []
+        for j in range(7):
+            if i >= len(data):
+                break
+            curr.append(data[i])
+            i += 1
+        ans.append(curr)
+    return ans
+
+
 
 if __name__ == "__main__":
 	app.run()

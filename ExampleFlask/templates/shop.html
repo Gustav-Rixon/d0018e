@@ -5,25 +5,28 @@
 {% block content %}
 <h2>Shop page</h2>
 
-<div class="display">
 
-<div class="displayCategory">
-	<div>
-	  <h2>Items</h2>
-	  {% for data in prodData%}
-	  	<table>
-	    		<tr id="productName">
-	    		{% for row in data %}
-	    			<td>
-	    				{{  row.prod_name  }}
-	    			</td>
-	    		{% endfor %}
-	    		</tr>
-	  	</table>
-	  {% endfor %}
-	</div>
+<h2>Items</h2>
+<tbody>
+{% for item in prodData %}
+	<table>
 
-</div>
+		<tr id="productName">
+			<td>{{ item.prod_name }}</td>
+		</tr>
 
+		<tr id="productPrice">
+			<td>{{ item.price }}</td>
+		</tr>
+
+		<tr id="productImg">
+			<a href="/gurx/productDescription?productId={{item.prod_id}}">
+				<img src={{ item.img_url }} id="itemImage" width="250" height="300" />
+			</a>
+		</tr>
+
+	</table>
+{% endfor %}
+</tbody>
 
 {% endblock %}
