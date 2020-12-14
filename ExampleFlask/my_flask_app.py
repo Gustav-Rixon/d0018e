@@ -113,42 +113,54 @@ def cart():
 	cursor.execute('SELECT * FROM Orders WHERE customer_id = % s', (cusData["customer_id"], ))
 	ordData = cursor.fetchall()
 
-	print (cusData)
-	print (ordData)
+#	print (cusData)
+#	print (ordData)
 	return render_template('cart.html')
 
-@app.route('/AddToCart', methods =['GET', 'POST'])
+@app.route('/addToCart', methods =['GET', 'POST'])
 def addToCart():
 
 	if 'email' not in session:
 		return redirect(url_for('login'))
 
 	else:
-
 		prod_id = request.args.get('productId')
 
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
 		cursor.execute("SELECT customer_id FROM Customers WHERE email = '" + session['email'] + "'")
 		userId = cursor.fetchone()
 
+		cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+		prodData = cursor.fetchone()
+
 		try:
 			tmp = random.randrange(10000)
+			val = tmp
 			tmp2 = random.randrange(10000)
 			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s)', (tmp, userId["customer_id"], 0, ))
 			mysql.connection.commit()
+
+			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (val, ))
+			orderInfo = cursor.fetchone()
+
+			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s)', (orderInfo["order_id"], orderInfo["order_id"] , 1, prodData["price"], prodData["prod_id"], ))
+			mysql.connection.commit()
+
 			msg = "Added successfully"
-
-#			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (userId["customer_id"]) 'AND WHERE ')
-#			orderId = cursor.fetchone()
-
-			#cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s,% s)', (orderId["order_id"], 1, 1, 1, 1, 1, ))
-			#mysql.connection.commit()
 
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
 	print (msg)
-	print (prod_id)
+#	print (prodData)
+	print (prodData["price"])
+	print (orderInfo)
+	print (orderInfo["order_id"])
+#	print (prod_id)
+#	print ("-----------------------------------------------------------------------------")
+#	print (prodData)
+#	print ("-----------------------------------------------------------------------------")
 	return redirect(url_for('cart'))
 
 #def removeFromCart():
