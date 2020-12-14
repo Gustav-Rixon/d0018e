@@ -7,14 +7,36 @@
 <div id="display">
 
 	<div id="productName">
-		<h1>1</h1>
-		<h1>hej{{  data.prod_name  }}</h1>
-		<h1>2</h1>
-		<h1>då{{  data  }}</h1>
-		<h1>3</h1>
-		<h1>gu{{  data[0]  }}</h1>
-		<h1>något{{  data.price  }}</h1>
+		<h1>{{  data.prod_name  }}</h1>
 	</div>
+
+	<div>
+		<img src={{  data.img_url  }} id="productImage" width="250" height="300" />
+	</div>
+
+
+	<div id="productDescription">
+		<h2>Details</h2>
+		<table id="descriptionTable">
+			<tr>
+				<td>Name</td>
+				<td>{{  data.prod_name  }}</td>
+			</tr>
+			<tr>
+				<td>Price</td>
+				<td>{{  data.price  }}</td>
+			</tr>
+			<tr>
+				<td>Stock</td>
+				<td>{{  data2.stock  }} units</td>
+			</tr>
+		</table>
+
+		<h2>Description</h2>
+		<p>{{  data.prod_description  }}</p>
+
+	</div>
+
 
 </div>
 {% endblock %}

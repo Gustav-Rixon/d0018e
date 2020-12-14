@@ -106,21 +106,40 @@ def shop():
 
 @app.route('/cart')
 def cart():
-	#cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-	#prod = request.form['prod_id']
-	#print (prod)
+
+	email = session['email']
+
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	
+
+
+	print (email)
+
 	return render_template('cart.html')
-#def addToCart():
+
+@app.route('/AddToCart')
+def addToCart():
+
+
+	return redirect(url_for('shop'))
+
 #def removeFromCart():
 
 @app.route("/productDescription")
 def productDescription():
-#	prod_id = request.form['prod_id']
+	prod_id = request.args.get('productId')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 #	cursor.execute('SELECT * FROM Products WHERE prod_id')
-	cursor.execute('SELECT * FROM Products WHERE prod_id = 1')
-	productData = cursor.fetchall()
-	return render_template('productDescription.html', data = productData)
+	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+	productData = cursor.fetchone()
+	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
+	relOwnData = cursor.fetchone()
+#	x = type(productData)
+#	print (x)
+#	print (productData)
+#	print (prod_id)
+	return render_template('productDescription.html', data = productData, data2 = relOwnData)
 
 #WTF IS THIS?????
 def parse(data):
