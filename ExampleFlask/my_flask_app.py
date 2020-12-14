@@ -101,28 +101,55 @@ def shop():
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 	cursor.execute('SELECT * FROM Products')
 	prodData = cursor.fetchall()
-#	prodData = parse(prodData)
 	return render_template('shop.html', prodData=prodData)
 
 @app.route('/cart')
 def cart():
-
-	email = session['email']
-
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-	
+	cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+	cusData = cursor.fetchone()
 
+	cursor.execute('SELECT * FROM Orders WHERE customer_id = % s', (cusData["customer_id"], ))
+	ordData = cursor.fetchall()
 
-	print (email)
-
+	print (cusData)
+	print (ordData)
 	return render_template('cart.html')
 
-@app.route('/AddToCart')
+@app.route('/AddToCart', methods =['GET', 'POST'])
 def addToCart():
 
+	if 'email' not in session:
+		return redirect(url_for('login'))
 
-	return redirect(url_for('shop'))
+	else:
+
+		prod_id = request.args.get('productId')
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute("SELECT customer_id FROM Customers WHERE email = '" + session['email'] + "'")
+		userId = cursor.fetchone()
+
+		try:
+			tmp = random.randrange(10000)
+			tmp2 = random.randrange(10000)
+			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s)', (tmp, userId["customer_id"], 0, ))
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+#			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (userId["customer_id"]) 'AND WHERE ')
+#			orderId = cursor.fetchone()
+
+			#cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s,% s)', (orderId["order_id"], 1, 1, 1, 1, 1, ))
+			#mysql.connection.commit()
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+	print (msg)
+	print (prod_id)
+	return redirect(url_for('cart'))
 
 #def removeFromCart():
 
@@ -154,6 +181,7 @@ def parse(data):
             i += 1
         ans.append(curr)
     return ans
+
 
 
 
