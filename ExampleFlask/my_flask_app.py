@@ -110,12 +110,29 @@ def cart():
 	cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 	cusData = cursor.fetchone()
 
-	cursor.execute('SELECT * FROM Orders WHERE customer_id = % s', (cusData["customer_id"], ))
+	cursor.execute('SELECT * FROM Products, Order_items WHERE order_id = % s AND prod_id = products_id', (cusData["customer_id"],))
 	ordData = cursor.fetchall()
 
-#	print (cusData)
+#	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (ordData[0]["products_id"], ))
+#	proData = cursor.fetchall()
+
+#	print (proData)
 #	print (ordData)
-	return render_template('cart.html')
+#	totData = ordData + proData
+#	totData = totData[0]
+#	print (type(proData[0]))
+#	print (type(ordData[0]))
+#	print (proData[0])
+#	print (ordData[0])
+#	print (type(proData))
+#	print (type(ordData))
+#	print (type(proData))
+#	print (type(ordData))
+#	print (type(totData))
+#	print (totData)
+#	print (ordData[0]["order_item_id"])
+#	print (type(ordData))
+	return render_template('cart.html', ordData=ordData)
 
 @app.route('/addToCart', methods =['GET', 'POST'])
 def addToCart():
@@ -125,6 +142,7 @@ def addToCart():
 
 	else:
 		prod_id = request.args.get('productId')
+		quy = request.args.get('quantityId')
 
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
@@ -144,7 +162,7 @@ def addToCart():
 			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (val, ))
 			orderInfo = cursor.fetchone()
 
-			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s)', (orderInfo["order_id"], orderInfo["order_id"] , 1, prodData["price"], prodData["prod_id"], ))
+			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s)', (orderInfo["order_id"], userId["customer_id"] , 1, prodData["price"], prodData["prod_id"], ))
 			mysql.connection.commit()
 
 			msg = "Added successfully"
@@ -152,18 +170,43 @@ def addToCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-	print (msg)
+	print (quy)
 #	print (prodData)
-	print (prodData["price"])
-	print (orderInfo)
-	print (orderInfo["order_id"])
+#	print (prodData["price"])
+#	print (orderInfo)
+#	print (orderInfo["order_id"])
 #	print (prod_id)
 #	print ("-----------------------------------------------------------------------------")
 #	print (prodData)
 #	print ("-----------------------------------------------------------------------------")
 	return redirect(url_for('cart'))
 
-#def removeFromCart():
+@app.route("/removeFromCart")
+def removeFromCart():
+
+	if 'email' not in session:
+        	return redirect(url_for('login'))
+
+
+	else:
+		orderId = request.args.get('orderId')
+		email = session['email']
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		try:
+			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
+			cursor.execute("DELETE FROM Orders WHERE order_id = % s", (orderId, ))
+
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+#	print (orderId)
+#	print (msg)
+	return redirect(url_for('cart'))
 
 @app.route("/productDescription")
 def productDescription():
