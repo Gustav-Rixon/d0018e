@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import random
+from datetime import date
 
 app = Flask(__name__)
 
@@ -105,39 +106,25 @@ def shop():
 
 @app.route('/cart')
 def cart():
-	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-	cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
-	cusData = cursor.fetchone()
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
 
-	cursor.execute('SELECT * FROM Products, Order_items WHERE order_id = % s AND prod_id = products_id', (cusData["customer_id"],))
-	ordData = cursor.fetchall()
+	else:
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-#	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (ordData[0]["products_id"], ))
-#	proData = cursor.fetchall()
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		cusData = cursor.fetchone()
 
-#	print (proData)
-#	print (ordData)
-#	totData = ordData + proData
-#	totData = totData[0]
-#	print (type(proData[0]))
-#	print (type(ordData[0]))
-#	print (proData[0])
-#	print (ordData[0])
-#	print (type(proData))
-#	print (type(ordData))
-#	print (type(proData))
-#	print (type(ordData))
-#	print (type(totData))
-#	print (totData)
-#	print (ordData[0]["order_item_id"])
-#	print (type(ordData))
+		cursor.execute('SELECT * FROM Products, Order_items WHERE order_id = % s AND prod_id = products_id', (cusData["customer_id"],))
+		ordData = cursor.fetchall()
+
 	return render_template('cart.html', ordData=ordData)
 
 @app.route('/addToCart', methods =['GET', 'POST'])
 def addToCart():
 
-	if 'email' not in session:
+	if 'loggedin' not in session:
 		return redirect(url_for('login'))
 
 	else:
@@ -170,15 +157,7 @@ def addToCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-	print (quy)
-#	print (prodData)
-#	print (prodData["price"])
-#	print (orderInfo)
-#	print (orderInfo["order_id"])
-#	print (prod_id)
-#	print ("-----------------------------------------------------------------------------")
-#	print (prodData)
-#	print ("-----------------------------------------------------------------------------")
+
 	return redirect(url_for('cart'))
 
 @app.route("/removeFromCart")
@@ -186,7 +165,6 @@ def removeFromCart():
 
 	if 'email' not in session:
         	return redirect(url_for('login'))
-
 
 	else:
 		orderId = request.args.get('orderId')
@@ -204,29 +182,29 @@ def removeFromCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-#	print (orderId)
-#	print (msg)
+
 	return redirect(url_for('cart'))
 
 @app.route("/productDescription")
 def productDescription():
 	prod_id = request.args.get('productId')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#	cursor.execute('SELECT * FROM Products WHERE prod_id')
+
 	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
 	productData = cursor.fetchone()
+
 	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
 	relOwnData = cursor.fetchone()
-#	x = type(productData)
-#	print (x)
-#	print (productData)
-#	print (prod_id)
-	return render_template('productDescription.html', data = productData, data2 = relOwnData)
+
+	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
+	feedbackData = cursor.fetchall()
+
+	return render_template('productDescription.html', data = productData, data2 = relOwnData, data3 = feedbackData)
 
 @app.route("/checkout", methods=['GET','POST'])
 def checkout():
-	if 'email' not in session:
-		return redirect(url_for('loginForm'))
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
 
 	else:
 		orderId = request.args.get('orderId')
@@ -254,22 +232,12 @@ def checkout():
 			mysql.connection.rollback()
 			msg = "Error occured"
 
-
-
-	print (msg)
-#	print (orderId)
-#	print (orderInfo)
-#	print (stockInfo)
-#	print (newstock)
-#	print (stockInfo["stock"])
-#	print (type(stockInfo["stock"]))
-
 	return render_template('checkout.html', orderInfo=orderInfo, orderId=orderId)
 
 @app.route("/vieworders", methods=['GET','POST'])
 def vieworders():
-	if 'email' not in session:
-		return redirect(url_for('loginForm'))
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
 
 	else:
 
@@ -285,23 +253,39 @@ def vieworders():
 	print (data)
 
 	return render_template("vieworders.html", data=data)
-#WTF IS THIS?????
-def parse(data):
-    ans = []
-    i = 0
-    while i < len(data):
-        curr = []
-        for j in range(7):
-            if i >= len(data):
-                break
-            curr.append(data[i])
-            i += 1
-        ans.append(curr)
-    return ans
 
+@app.route("/addComment", methods=['POST'])
+def addComment():
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+		tmp = random.randrange(10000)
+		email = session['email']
+		comment = request.form['comment']
+		grade = request.form['grade']
+		data = request.form['data']
+		today = date.today()
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		userId = cursor.fetchone()
+		try:
+			cursor.execute('INSERT INTO Feedback VALUES (% s, % s, % s, % s, % s, % s)', (tmp, data, grade, comment, today, userId["customer_id"], ))
+			mysql.connection.commit()
+			msg = 'Added successfully'
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+
+	return productDescription()
+
+@app.route("/changeQty", methods=['POST'])
+def changeQty():
+	return null
 
 
 
 if __name__ == "__main__":
 	app.run()
-

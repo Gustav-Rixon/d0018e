@@ -25,16 +25,7 @@
 		<br>
 	</tr>
 
-	<tr id="itemPrice">
 
-		<form method="post" action="">
-		<div>
-        		<label for="name">Qty:</label>
-       		 	<input type="text" name="Qty" id="tmp" value={{ item.order_item_quantity }}>
-			<a href="/gurx/addToCart?quantityId={{  item.order_item_quantity  }}">test</a>
-    		</div>
-		</form>
-	</tr>
 	<a href="/gurx/removeFromCart?orderId={{  item.order_item_id  }}">Remove</a>
 	<br>
 	<a href="/gurx/checkout?orderId={{  item.order_item_id  }}">Proceed to checkout</a>
