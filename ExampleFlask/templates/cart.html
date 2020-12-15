@@ -21,12 +21,27 @@
 	</tr>
 
 	<tr id="itemPrice">
-		<td>Price: {{ item.order_item_price }}</td>
+		<td>Price: {{ item.price }}</td>
 		<br>
 	</tr>
 
 
-	<a href="/gurx/removeFromCart?orderId={{  item.order_item_id  }}">Remove</a>
+	<div id="showQty">
+		<tb>Qty: {{ item.order_item_quantity  }}</tb>		
+	</div>
+
+	<h4>Change Qty</h4>
+	<div id="changeQty">
+		<form name=changeQty action="/gurx/changeQty?OrderId={{item.order_item_id}}" method="POST">
+		<label>Desired ammount:</label>
+		<input type="text" name="ammount">
+
+		<input type="hidden" name="orderId" value={{  item.order_item_id  }}>
+
+		<input type="submit" value="submit">
+	</div>
+	
+	<a href="/gurx/removeFromCart?orderId={{ item.order_item_id }}">Remove</a>
 	<br>
 	<a href="/gurx/checkout?orderId={{  item.order_item_id  }}">Proceed to checkout</a>
 

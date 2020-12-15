@@ -143,7 +143,7 @@ def addToCart():
 			tmp = random.randrange(10000)
 			val = tmp
 			tmp2 = random.randrange(10000)
-			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s)', (tmp, userId["customer_id"], 0, ))
+			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s,% s,% s,% s)', (tmp, userId["customer_id"], 0, None, None, None, ))
 			mysql.connection.commit()
 
 			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (val, ))
@@ -157,7 +157,7 @@ def addToCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-
+#	print (msg)
 	return redirect(url_for('cart'))
 
 @app.route("/removeFromCart")
@@ -218,20 +218,19 @@ def checkout():
 
 			if stockInfo["stock"] > orderInfo["order_item_quantity"]:
 				newstock = stockInfo["stock"] - orderInfo["order_item_quantity"]
-#FIXA SÅ ATT DEN GÖR NÅGOT SMART OM DEN INTE UPPFYLLER KRAV
-#			else:
-#				continue
 
 			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["products_id"], ))
 			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
-			cursor.execute("UPDATE Orders SET order_status = 1 WHERE order_id = % s", (orderId, ))
+			cursor.execute("UPDATE Orders SET order_status = 1, prod_id = % s, pris_fast = % s, quantity = % s WHERE order_id = % s", (orderInfo["products_id"], orderInfo["order_item_price"], orderInfo["order_item_quantity"], orderInfo["order_item_id"], ))
 			mysql.connection.commit()
 			msg = "Added successfully"
 
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-
+	print (orderInfo["order_item_id"])
+	print (orderInfo)
+	print (msg)
 	return render_template('checkout.html', orderInfo=orderInfo, orderId=orderId)
 
 @app.route("/vieworders", methods=['GET','POST'])
@@ -249,8 +248,8 @@ def vieworders():
 		cursor.execute('SELECT * FROM Orders WHERE customer_id = % s AND order_status = 1', (userId["customer_id"], ))
 		data = cursor.fetchall()
 
-	print (userId)
-	print (data)
+#	print (userId)
+#	print (data)
 
 	return render_template("vieworders.html", data=data)
 
@@ -283,9 +282,22 @@ def addComment():
 
 @app.route("/changeQty", methods=['POST'])
 def changeQty():
-	return null
 
+	ammount = request.form['ammount']
+	orderId = request.form['orderId']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
+	try:
+		cursor.execute("UPDATE Order_items SET order_item_quantity = % s WHERE order_item_id = % s", (ammount, orderId ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+#	print (msg)
+	return redirect(url_for('cart'))
 
 if __name__ == "__main__":
 	app.run()
