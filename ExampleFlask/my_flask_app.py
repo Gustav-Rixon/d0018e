@@ -223,6 +223,68 @@ def productDescription():
 #	print (prod_id)
 	return render_template('productDescription.html', data = productData, data2 = relOwnData)
 
+@app.route("/checkout", methods=['GET','POST'])
+def checkout():
+	if 'email' not in session:
+		return redirect(url_for('loginForm'))
+
+	else:
+		orderId = request.args.get('orderId')
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		try:
+			cursor.execute('SELECT * FROM Order_items WHERE order_item_id = % s', (orderId, ))
+			orderInfo = cursor.fetchone()
+			cursor.execute('SELECT * FROM RelOwnProd WHERE prod_id = % s', (orderInfo["products_id"], ))
+			stockInfo = cursor.fetchone()
+
+			if stockInfo["stock"] > orderInfo["order_item_quantity"]:
+				newstock = stockInfo["stock"] - orderInfo["order_item_quantity"]
+#FIXA SÅ ATT DEN GÖR NÅGOT SMART OM DEN INTE UPPFYLLER KRAV
+#			else:
+#				continue
+
+			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["products_id"], ))
+			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
+			cursor.execute("UPDATE Orders SET order_status = 1 WHERE order_id = % s", (orderId, ))
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+
+
+
+	print (msg)
+#	print (orderId)
+#	print (orderInfo)
+#	print (stockInfo)
+#	print (newstock)
+#	print (stockInfo["stock"])
+#	print (type(stockInfo["stock"]))
+
+	return render_template('checkout.html', orderInfo=orderInfo, orderId=orderId)
+
+@app.route("/vieworders", methods=['GET','POST'])
+def vieworders():
+	if 'email' not in session:
+		return redirect(url_for('loginForm'))
+
+	else:
+
+		email = session['email']
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		userId = cursor.fetchone()
+
+		cursor.execute('SELECT * FROM Orders WHERE customer_id = % s AND order_status = 1', (userId["customer_id"], ))
+		data = cursor.fetchall()
+
+	print (userId)
+	print (data)
+
+	return render_template("vieworders.html", data=data)
 #WTF IS THIS?????
 def parse(data):
     ans = []

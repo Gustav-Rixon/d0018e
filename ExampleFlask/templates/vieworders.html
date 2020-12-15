@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title %}view{% endblock %}
+
+{% block content %}
+	<div id="orders">
+		<h2>Your orders</h2>
+	</div>
+
+{% for item in data %}
+
+	<tr id="order_id">
+		<td>{{ item.order_id }}</td>
+	</tr>
+
+	<br>
+
+{% endfor %}
+
+
+{% endblock %}
