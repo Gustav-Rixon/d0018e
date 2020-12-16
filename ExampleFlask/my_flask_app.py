@@ -285,7 +285,7 @@ def addComment():
 @app.route("/changeQty", methods=['POST'])
 def changeQty():
 
-	ammount = request.form['ammount']
+	ammount = request.form['amount']
 	orderId = request.form['orderId']
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
@@ -298,7 +298,9 @@ def changeQty():
 		mysql.connection.rollback()
 		msg = "Error occured"
 
-#	print (msg)
+	print (ammount)
+	print (orderId)
+	print (msg)
 	return redirect(url_for('cart'))
 
 if __name__ == "__main__":

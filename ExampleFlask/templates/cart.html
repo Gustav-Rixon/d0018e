@@ -8,6 +8,8 @@
 	</div>
 {% for item in ordData %}
 
+	
+
 	<tr id="itemPic">
 		<td>
 		<img src={{ item.img_url }} id="itemImage" width="125" height="150" />
@@ -30,15 +32,20 @@
 		<tb>Qty: {{ item.order_item_quantity  }}</tb>		
 	</div>
 
+
+	Your order ID: {{  item.order_item_id   }}
+
 	<h4>Change Qty</h4>
-	<div id="changeQty">
+	<div id={{  item.order_item_id   }}>
 		<form name=changeQty action="/gurx/changeQty?OrderId={{item.order_item_id}}" method="POST">
-		<label>Desired ammount:</label>
-		<input type="text" name="ammount">
+			<label>Desired amount:</label>
+			<input type="text" name="amount" value={{  item.order_item_quantity  }}>
 
-		<input type="hidden" name="orderId" value={{  item.order_item_id  }}>
+			<input type="hidden" name="orderId" value={{  item.order_item_id  }}>
 
-		<input type="submit" value="submit">
+			<input type="submit" value="submit">
+
+		</form>
 	</div>
 	
 	<a href="/gurx/removeFromCart?orderId={{ item.order_item_id }}">Remove</a>
