@@ -116,7 +116,8 @@ def cart():
 		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 		cusData = cursor.fetchone()
 
-		cursor.execute('SELECT * FROM Products, Order_items WHERE order_id = % s AND prod_id = products_id', (cusData["customer_id"],))
+
+		cursor.execute('SELECT * FROM Products, Order_items, Orders WHERE customer_id = % s and order_item_id = order_id AND Order_items.prod_id = Products.prod_id', (cusData["customer_id"], ))
 		ordData = cursor.fetchall()
 
 	return render_template('cart.html', ordData=ordData)
@@ -143,15 +144,15 @@ def addToCart():
 			tmp = random.randrange(10000)
 			val = tmp
 			tmp2 = random.randrange(10000)
-			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s,% s,% s,% s)', (tmp, userId["customer_id"], 0, None, None, None, ))
+			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s,% s,% s,% s)', (tmp, 0, prod_id, None, 1, userId["customer_id"], ))
 			mysql.connection.commit()
 
 			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (val, ))
 			orderInfo = cursor.fetchone()
 
-			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s,% s,% s)', (orderInfo["order_id"], userId["customer_id"] , 1, prodData["price"], prodData["prod_id"], ))
-			mysql.connection.commit()
+			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s)', (orderInfo["order_id"], 1, prodData["prod_id"], ))
 
+			mysql.connection.commit()
 			msg = "Added successfully"
 
 		except:
