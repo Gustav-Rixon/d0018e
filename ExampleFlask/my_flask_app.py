@@ -214,24 +214,25 @@ def checkout():
 		try:
 			cursor.execute('SELECT * FROM Order_items WHERE order_item_id = % s', (orderId, ))
 			orderInfo = cursor.fetchone()
-			cursor.execute('SELECT * FROM RelOwnProd WHERE prod_id = % s', (orderInfo["products_id"], ))
+			cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (orderInfo["prod_id"], ))
 			stockInfo = cursor.fetchone()
 
 			if stockInfo["stock"] > orderInfo["order_item_quantity"]:
 				newstock = stockInfo["stock"] - orderInfo["order_item_quantity"]
 
-			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["products_id"], ))
+			cursor.execute('SELECT price FROM Products WHERE prod_id = % s', (orderInfo["prod_id"], ))
+			proInfo = cursor.fetchone()
+
+			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["prod_id"], ))
 			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
-			cursor.execute("UPDATE Orders SET order_status = 1, prod_id = % s, pris_fast = % s, quantity = % s WHERE order_id = % s", (orderInfo["products_id"], orderInfo["order_item_price"], orderInfo["order_item_quantity"], orderInfo["order_item_id"], ))
+			cursor.execute("UPDATE Orders SET order_status = 1, pris_fast = % s, quantity = % s WHERE order_id = % s", (proInfo["price"], orderInfo["order_item_quantity"], orderInfo["order_item_id"], ))
 			mysql.connection.commit()
 			msg = "Added successfully"
 
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-	print (orderInfo["order_item_id"])
-	print (orderInfo)
-	print (msg)
+
 	return render_template('checkout.html', orderInfo=orderInfo, orderId=orderId)
 
 @app.route("/vieworders", methods=['GET','POST'])
@@ -246,7 +247,7 @@ def vieworders():
 		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 		userId = cursor.fetchone()
 
-		cursor.execute('SELECT * FROM Orders WHERE customer_id = % s AND order_status = 1', (userId["customer_id"], ))
+		cursor.execute('SELECT Products.prod_name, Products.img_url, Products.prod_description, Orders.quantity, Orders.pris_fast, Orders.order_id, Orders.customer_id FROM Products, Orders WHERE order_status = 1 AND Orders.customer_id = % s AND Orders.prod_id = Products.prod_id', (userId["customer_id"], ))
 		data = cursor.fetchall()
 
 #	print (userId)
