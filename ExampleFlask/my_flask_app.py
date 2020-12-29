@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import random
+from datetime import date
 
 app = Flask(__name__)
 
@@ -32,14 +33,13 @@ def login():
 		password = request.form['password']
 		# Check if account exists using MySQL
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM Customers WHERE email = % s AND password = % s', (email, password,))
+		cursor.execute('SELECT * FROM Customers WHERE email = % s AND password = % s AND customer_id', (email, password,))
 		# Fetch one record and return result
 		account = cursor.fetchone()
 		# If account exists in accounts table in out database
 		if account:
 			# Create session data, we can access this data in other routes
 			session['loggedin'] = True
-	#		session['customer_id'] = account['id']
 			session['password'] = account['password']
 			session['email'] = account['email']
 			# Redirect to home page
@@ -87,23 +87,221 @@ def home():
 		return render_template('home.html', email=session['email'])
 	return redirect(url_for('login'))
 
-@app.route('/shop')
-def shop():
-	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-	cursor.execute('SELECT * FROM Products')
-	data = cursor.fetchall()
-	return render_template('shop.html', data=data)
-
 #This will be the profile page, only accessible for loggedin users
 @app.route('/profile')
 def profile():
 	if 'loggedin' in session:
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT * FROM Customers WHERE customer_id = % s', (session['id'],))
+		cursor.execute('SELECT * FROM Customers WHERE email = % s', (session['email'],))
 		account = cursor.fetchone()
 		return render_template('profile.html', account=account)
 	return redirect(url_for('login'))
 
+@app.route('/shop')
+def shop():
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT * FROM Products')
+	prodData = cursor.fetchall()
+	return render_template('shop.html', prodData=prodData)
+
+@app.route('/cart')
+def cart():
+
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		cusData = cursor.fetchone()
+
+
+		cursor.execute('SELECT * FROM Products, Order_items, Orders WHERE customer_id = % s and order_item_id = order_id AND Order_items.prod_id = Products.prod_id', (cusData["customer_id"], ))
+		ordData = cursor.fetchall()
+
+	return render_template('cart.html', ordData=ordData)
+
+@app.route('/addToCart', methods =['GET', 'POST'])
+def addToCart():
+
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+		prod_id = request.args.get('productId')
+		quy = request.args.get('quantityId')
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		cursor.execute("SELECT customer_id FROM Customers WHERE email = '" + session['email'] + "'")
+		userId = cursor.fetchone()
+
+		cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+		prodData = cursor.fetchone()
+
+		try:
+			tmp = random.randrange(10000)
+			val = tmp
+			tmp2 = random.randrange(10000)
+			cursor.execute('INSERT INTO Orders VALUES (% s,% s,% s,% s,% s,% s)', (tmp, 0, prod_id, None, 1, userId["customer_id"], ))
+			mysql.connection.commit()
+
+			cursor.execute('SELECT order_id FROM Orders WHERE order_id = % s', (val, ))
+			orderInfo = cursor.fetchone()
+
+			cursor.execute('INSERT INTO Order_items VALUES (% s,% s,% s)', (orderInfo["order_id"], 1, prodData["prod_id"], ))
+
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+#	print (msg)
+	return redirect(url_for('cart'))
+
+@app.route("/removeFromCart")
+def removeFromCart():
+
+	if 'email' not in session:
+        	return redirect(url_for('login'))
+
+	else:
+		orderId = request.args.get('orderId')
+		email = session['email']
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		try:
+			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
+			cursor.execute("DELETE FROM Orders WHERE order_id = % s", (orderId, ))
+
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+
+	return redirect(url_for('cart'))
+
+@app.route("/productDescription")
+def productDescription():
+	prod_id = request.args.get('productId')
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+	productData = cursor.fetchone()
+
+	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
+	relOwnData = cursor.fetchone()
+
+	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
+	feedbackData = cursor.fetchall()
+
+	return render_template('productDescription.html', data = productData, data2 = relOwnData, data3 = feedbackData)
+
+@app.route("/checkout", methods=['GET','POST'])
+def checkout():
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+		orderId = request.args.get('orderId')
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+		try:
+			cursor.execute('SELECT * FROM Order_items WHERE order_item_id = % s', (orderId, ))
+			orderInfo = cursor.fetchone()
+			cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (orderInfo["prod_id"], ))
+			stockInfo = cursor.fetchone()
+
+			if stockInfo["stock"] > orderInfo["order_item_quantity"]:
+				newstock = stockInfo["stock"] - orderInfo["order_item_quantity"]
+
+			cursor.execute('SELECT price FROM Products WHERE prod_id = % s', (orderInfo["prod_id"], ))
+			proInfo = cursor.fetchone()
+
+			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["prod_id"], ))
+			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
+			cursor.execute("UPDATE Orders SET order_status = 1, pris_fast = % s, quantity = % s WHERE order_id = % s", (proInfo["price"], orderInfo["order_item_quantity"], orderInfo["order_item_id"], ))
+			mysql.connection.commit()
+			msg = "Added successfully"
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+
+	return render_template('checkout.html', orderInfo=orderInfo, orderId=orderId)
+
+@app.route("/vieworders", methods=['GET','POST'])
+def vieworders():
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+
+		email = session['email']
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		userId = cursor.fetchone()
+
+		cursor.execute('SELECT Products.prod_name, Products.img_url, Products.prod_description, Orders.quantity, Orders.pris_fast, Orders.order_id, Orders.customer_id FROM Products, Orders WHERE order_status = 1 AND Orders.customer_id = % s AND Orders.prod_id = Products.prod_id', (userId["customer_id"], ))
+		data = cursor.fetchall()
+
+#	print (userId)
+#	print (data)
+
+	return render_template("vieworders.html", data=data)
+
+@app.route("/addComment", methods=['POST'])
+def addComment():
+	if 'loggedin' not in session:
+		return redirect(url_for('login'))
+
+	else:
+		tmp = random.randrange(10000)
+		email = session['email']
+		comment = request.form['comment']
+		grade = request.form['grade']
+		data = request.form['data']
+		today = date.today()
+
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		userId = cursor.fetchone()
+		try:
+			cursor.execute('INSERT INTO Feedback VALUES (% s, % s, % s, % s, % s, % s)', (tmp, data, grade, comment, today, userId["customer_id"], ))
+			mysql.connection.commit()
+			msg = 'Added successfully'
+
+		except:
+			mysql.connection.rollback()
+			msg = "Error occured"
+
+	return productDescription()
+
+@app.route("/changeQty", methods=['POST'])
+def changeQty():
+
+	ammount = request.form['amount']
+	orderId = request.form['orderId']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute("UPDATE Order_items SET order_item_quantity = % s WHERE order_item_id = % s", (ammount, orderId ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	print (ammount)
+	print (orderId)
+	print (msg)
+	return redirect(url_for('cart'))
+
 if __name__ == "__main__":
 	app.run()
-

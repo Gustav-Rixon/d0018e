@@ -1,31 +1,35 @@
-<!DOCTYPE html>
-<html>
+{% extends 'layout.html' %}
 
-<head>
- <title>shop test</title> 
-</head>
+{% block title %}Shop{% endblock %}
 
-<body>
+{% block content %}
+<h2>Shop page</h2>
 
-<table border="1" cellpadding="5" cellspacing="5">
-    <thead>
-    <tr>
-        <th>prod_name</th>
-        <th>price(Dollares)</th>
-        <th>cat_id</th>
-    </tr>
-    </thead>
 
+<h2>Items</h2>
 <tbody>
-{% for item in data %}
-    <tr>
-        <td>{{ item.prod_name }}</td>
-        <td>{{ item.price }}</td>
-        <td>{{ item.categorie_id }}</td>
-    </tr>
+
+<!--<h1>{{ prodData }}</h1>-->
+
+{% for item in prodData %}
+	<table>
+
+		<tr id="productName">
+			<td>{{ item.prod_name }}</td>
+		</tr>
+
+		<tr id="productPrice">
+			<td>{{ item.price }}</td>
+		</tr>
+
+		<tr id="productImg">
+			<a href="/gurx/productDescription?productId={{item.prod_id}}">
+				<img src={{ item.img_url }} id="itemImage" width="250" height="300" />
+			</a>
+		</tr>
+
+	</table>
 {% endfor %}
 </tbody>
-</table>
 
-</body>
-</html>
+{% endblock %}
