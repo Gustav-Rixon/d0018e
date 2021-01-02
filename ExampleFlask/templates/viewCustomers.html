@@ -1,0 +1,28 @@
+{% extends 'layoutAdmin.html' %}
+
+{% block title %}viewCustomers{% endblock %}
+
+{% block content %}
+
+<div id="display">
+
+{% for item in data %}
+
+	<div id="First Name">
+		<h5>First name: {{  item.first_name  }}</h5>
+	</div>
+
+	<div id="Last Name">
+		<h5>Last name: {{  item.last_name  }}</h5>
+	</div>
+
+	<div id="email">
+		<h5>Email: {{  item.email  }}</h5>
+	</div>
+
+	<h5>-------------------</h5>
+
+{% endfor %}
+
+</div>
+{% endblock %}

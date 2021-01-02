@@ -137,6 +137,10 @@ def addToCart():
 		cursor.execute("SELECT customer_id FROM Customers WHERE email = '" + session['email'] + "'")
 		userId = cursor.fetchone()
 
+		print ('#################################################################################')
+		print (prod_id)
+		print ('#################################################################################')
+
 		cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
 		prodData = cursor.fetchone()
 
@@ -158,7 +162,10 @@ def addToCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-#	print (msg)
+	print ('#################################################################################')
+	print (msg)
+	print (prod_id)
+	print ('#################################################################################')
 	return redirect(url_for('cart'))
 
 @app.route("/removeFromCart")
@@ -191,14 +198,39 @@ def productDescription():
 	prod_id = request.args.get('productId')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+	print ('################################')
+	print (prod_id)
+	print (type(prod_id))
+	print ('################################')
+
+
+	print ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+#	cursor.execute('SELECT * FROM Products WHERE prod_id = 27')
+	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id), )
 	productData = cursor.fetchone()
+	print ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
-	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
+	print ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
+#	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = 27' )
+	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id), )
 	relOwnData = cursor.fetchone()
+	print ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
 
-	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
+	print ('llllllllllllllllllllllllllllllllllllllllll')
+	cursor.execute('SELECT * FROM Feedback WHERE prod_id = 27')
+#	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
 	feedbackData = cursor.fetchall()
+	print ('llllllllllllllllllllllllllllllllllllllllll')
+
+
+
+	print ('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+	print (productData)
+	print (relOwnData)
+	print (feedbackData)
+	print ('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+
 
 	return render_template('productDescription.html', data = productData, data2 = relOwnData, data3 = feedbackData)
 
@@ -261,7 +293,6 @@ def addComment():
 		return redirect(url_for('login'))
 
 	else:
-		tmp = random.randrange(10000)
 		email = session['email']
 		comment = request.form['comment']
 		grade = request.form['grade']
@@ -272,7 +303,7 @@ def addComment():
 		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 		userId = cursor.fetchone()
 		try:
-			cursor.execute('INSERT INTO Feedback VALUES (% s, % s, % s, % s, % s, % s)', (tmp, data, grade, comment, today, userId["customer_id"], ))
+			cursor.execute('INSERT INTO Feedback (prod_id, rating, comment, date, customer_id) VALUES (% s, % s, % s, % s, % s)', (data, grade, comment, today, userId["customer_id"], ))
 			mysql.connection.commit()
 			msg = 'Added successfully'
 
@@ -302,6 +333,168 @@ def changeQty():
 	print (orderId)
 	print (msg)
 	return redirect(url_for('cart'))
+
+####Admin shitt is here########
+
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+	msg = ''
+	# Check if "username" and "password" POST requests exist (user submitted form)
+	if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
+		# Create variables for easy access
+		email = request.form['email']
+		password = request.form['password']
+		# Check if account exists using MySQL
+		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+		cursor.execute('SELECT * FROM Owner WHERE email = % s AND password = % s AND owner_id', (email, password,))
+		# Fetch one record and return result
+		account = cursor.fetchone()
+		# If account exists in accounts table in out database
+		if account:
+			# Create session data, we can access this data in other routes
+			session['loggedin'] = True
+			session['password'] = account['password']
+			session['email'] = account['email']
+			# Redirect to home page
+
+			return render_template('adminHome.html')
+		else:
+			msg = "you didn't say the magic word"
+	return render_template('adminLogin.html', msg=msg)
+
+@app.route("/adminProducts")
+def adminProducts():
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT * FROM Products')
+	prodData = cursor.fetchall()
+	return render_template('adminProducts.html', prodData=prodData)
+
+@app.route("/productDescriptionAdmin")
+def productDescriptionAdmin():
+	prod_id = request.args.get('productId')
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+
+	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
+	productData = cursor.fetchone()
+
+	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
+	relOwnData = cursor.fetchone()
+
+	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
+	feedbackData = cursor.fetchall()
+
+	return render_template('productDescriptionAdmin.html', data = productData, data2 = relOwnData, data3 = feedbackData)
+
+@app.route("/viewCustomers")
+def viewCustomers():
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT first_name, last_name, email FROM Customers WHERE owner_id = 1')
+	data = cursor.fetchall()
+	print (data)
+	return render_template('viewCustomers.html', data=data)
+
+@app.route("/addProduct", methods=['GET', 'POST'])
+def addProduct():
+
+	name = request.form['name']
+	price = request.form['price']
+	pic = request.form['pic']
+	category = request.form['category']
+	description = request.form['description']
+	stock = request.form['stock']
+
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('SELECT MAX(rel_own_prod_id) FROM RelOwnProd')
+		Id = cursor.fetchone()
+		Id = Id["MAX(rel_own_prod_id)"] + 1
+
+		cursor.execute('INSERT INTO RelOwnProd (owner_id, prod_id, stock) VALUES (% s, % s, % s)', (1, Id, stock), )
+		cursor.execute('INSERT INTO Products (prod_id, prod_name, price, img_url, categorie_id, prod_description) VALUES (% s, % s, % s, % s, % s, % s)', (Id, name, price, pic, category, description), )
+		mysql.connection.commit()
+		msg = 'Added successfully'
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminTools'))
+
+@app.route("/removeProduct", methods=['GET', 'POST'])
+def removeProduct():
+	ID = request.form['ID']
+
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('DELETE From RelOwnProd WHERE prod_id = % s', (ID, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminTools'))
+
+
+@app.route("/removeComment", methods=['GET', 'POST'])
+def removeComment():
+	comment = request.args.get('productComment')
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('DELETE From Feedback WHERE feedback = % s', (comment, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+
+	return redirect(url_for('adminProducts'))
+
+@app.route("/addCategory", methods=['GET', 'POST'])
+def addCategory():
+	add = request.form['nameCat']
+#	tmp = random.randrange(1000000)
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('INSERT INTO Categories (category_id, category_name) VALUES (% s, % s)', (random.randrange(1000000), add, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+
+	return redirect(url_for('adminTools'))
+
+@app.route("/removeCategory", methods=['GET', 'POST'])
+def removeCategory():
+	rem = request.form['nameCat2']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('DELETE From Categories WHERE category_id = % s', (rem, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+
+	return redirect(url_for('adminTools'))
+
+@app.route("/adminTools")
+def adminTools():
+	return render_template('adminTools.html')
+
 
 if __name__ == "__main__":
 	app.run()
