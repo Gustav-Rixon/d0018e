@@ -3,6 +3,10 @@
 {% block title %}product{% endblock %}
 
 {% block content %}
+<br>
+<a href="">++Add a product</a><br>
+<a href="">++Add a product category</a>
+<a href="">--Remove product category</a>
 
 <h2>Current products</h2>
 
@@ -15,15 +19,11 @@
 	<table>
 
 		<tr id="productName">
-			<td>Name {{ item.prod_name }}</td>
-		</tr>
-
-		<tr id="productName">
-			<td>ID {{ item.prod_id }}</td>
+			<td>{{ item.prod_name }}</td>
 		</tr>
 
 		<tr id="productPrice">
-			<td>Price {{ item.price }}</td>
+			<td>{{ item.price }}</td>
 		</tr>
 
 		<tr id="productImg">

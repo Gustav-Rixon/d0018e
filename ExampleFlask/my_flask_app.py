@@ -217,8 +217,8 @@ def productDescription():
 	print ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
 
 	print ('llllllllllllllllllllllllllllllllllllllllll')
-	cursor.execute('SELECT * FROM Feedback WHERE prod_id = 27')
-#	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
+#	cursor.execute('SELECT * FROM Feedback WHERE prod_id = 27')
+	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
 	feedbackData = cursor.fetchall()
 	print ('llllllllllllllllllllllllllllllllllllllllll')
 
@@ -459,7 +459,6 @@ def removeComment():
 @app.route("/addCategory", methods=['GET', 'POST'])
 def addCategory():
 	add = request.form['nameCat']
-#	tmp = random.randrange(1000000)
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
 	try:
@@ -470,7 +469,6 @@ def addCategory():
 	except:
 		mysql.connection.rollback()
 		msg = "Error occured"
-
 
 	return redirect(url_for('adminTools'))
 
@@ -491,7 +489,91 @@ def removeCategory():
 
 	return redirect(url_for('adminTools'))
 
-@app.route("/adminTools")
+@app.route("/modifyStock", methods=['GET', 'POST'])
+def modifyStock():
+	prod = request.args.get('productId')
+	data = request.form['newStock']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (data, prod, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminProducts'))
+
+@app.route("/modifyPrice", methods=['GET', 'POST'])
+def modifyPrice():
+	prod = request.args.get('productId')
+	data = request.form['newPrice']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('UPDATE Products SET price = % s WHERE prod_id = % s', (data, prod, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminProducts'))
+
+@app.route("/changePicture", methods=['GET', 'POST'])
+def changePicture():
+	prod = request.args.get('productId')
+	data = request.form['newPic']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('UPDATE Products SET img_url = % s WHERE prod_id = % s', (data, prod, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminProducts'))
+
+@app.route("/changeName", methods=['GET', 'POST'])
+def changeName():
+	prod = request.args.get('productId')
+	data = request.form['newName']
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+	try:
+		cursor.execute('UPDATE Products SET prod_name = % s WHERE prod_id = % s', (data, prod, ))
+		mysql.connection.commit()
+		msg = 'Added successfully'
+
+	except:
+		mysql.connection.rollback()
+		msg = "Error occured"
+
+	return redirect(url_for('adminProducts'))
+
+@app.route("/viewCustomerOrder", methods=['GET', 'POST'])
+def viewCustomerOrder():
+
+	email = request.args.get('customer')
+	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+	cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (email, ))
+	userId = cursor.fetchone()
+
+	cursor.execute('SELECT Products.prod_name, Products.img_url, Products.prod_description, Orders.quantity, Orders.pris_fast, Orders.order_id, Orders.customer_id FROM Products, Orders WHERE order_status = 1 AND Orders.customer_id = % s AND Orders.prod_id = Products.prod_id', (userId["customer_id"], ))
+	data = cursor.fetchall()
+
+#	print (userId)
+#	print (data)
+
+	return render_template("viewordersAdmin.html", data=data, userId=userId)
+
+@app.route("/adminTools", methods=['GET', 'POST'])
 def adminTools():
 	return render_template('adminTools.html')
 

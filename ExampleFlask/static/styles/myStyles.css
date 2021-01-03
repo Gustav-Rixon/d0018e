@@ -1,0 +1,32 @@
+* {
+  text-align: center;
+}
+
+#productName {
+ text-align: center;
+}
+
+#productPrice {
+ text-align: center;
+}
+
+.ree {
+ align-content: center;
+}
+
+.links {
+    overflow: hidden;
+}
+
+.links a {
+  color: #a2b2c2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.links a:hover {
+  color: black;
+}
+

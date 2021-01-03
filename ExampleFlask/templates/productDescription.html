@@ -3,7 +3,7 @@
 {% block title %}productDescription{% endblock %}
 
 {% block content %}
-
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/shopStyles.css">
 <div id="display">
 
 	<div id="productName">
@@ -17,21 +17,8 @@
 
 	<div id="productDescription">
 		<h2>Details</h2>
-		<table id="descriptionTable">
-			<tr>
-				<td>Name</td>
-				<td>{{  data.prod_name  }}</td>
-			</tr>
-			<tr>
-				<td>Price</td>
-				<td>{{  data.price  }}</td>
-			</tr>
-			<tr>
-				<td>Stock</td>
-				<td>{{  data2.stock  }} units</td>
-			</tr>
-		</table>
-
+		<p>{{ data.prod_name }}:{{ data.price}} kr</p>
+		<p>{{data2.stock}} units </p>
 		<h2>Description</h2>
 		<p>{{  data.prod_description  }}</p>
 

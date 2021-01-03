@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block title %}Shop{% endblock %}
+
+{% block content %}
+<h2>Shop page</h2>
+
+
+<h2>Items</h2>
+<tbody>
+
+<!--<h1>{{ prodData }}</h1>-->
+
+{% for item in prodData %}
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/myStyles.css">
+<div class="reee"
+	<table>
+
+		<tr id="productName">
+			<td>{{ item.prod_name }}</td>
+		</tr>
+
+		<tr id="productPrice">
+			<td>{{ item.price }}</td>
+		</tr>
+
+		<tr id="productImg">
+			<a href="/edde/productDescription?productId={{item.prod_id}}">
+				<img src={{ item.img_url }} id="itemImage" width="250" height="300" />
+			</a>
+		</tr>
+
+	</table>
+{% endfor %}
+</tbody>
+
+{% endblock %}

@@ -3,25 +3,14 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
+
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/shopStyles.css">
 <h2>Profile Page</h2><div>
     <p>Your account details are below:</p>
-    <table>
-        <tr>
-            <td>First name:</td>
-            <td>{{ account['first_name'] }}</td>
-        </tr>
-        <tr>
-            <td>Last name:</td>
-            <td>{{ account['last_name'] }}</td>
-        </tr>
-        <tr>
-            <td>password:</td>
-            <td>{{ account['password'] }}</td>
-        </tr>
-        <tr>
-            <td>Email:</td>
-            <td>{{ account['email'] }}</td>
-        </tr>
-    </table>
+	<p>First Name: {{account['first_name']}} </p>
+	<p>Last name: {{account['last_name']}} </p>
+	<p>Password: {{account['password']}} </p> 
+	<p> Email: {{account['email']}} </p> 
 </div>
 {% endblock %}
+

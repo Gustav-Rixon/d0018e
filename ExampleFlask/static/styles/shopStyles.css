@@ -1,0 +1,9 @@
+* {
+ align-content: center;
+ text-align: center;
+ vertical-align: middle;
+}
+
+img {
+  border: 5px solid #555;
+}

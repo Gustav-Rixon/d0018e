@@ -1,0 +1,117 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  margin-left: 1em; 
+}
+
+h2 { 
+  margin-left: 1em; 
+}
+
+p {
+  margin-left: 1em;
+}
+
+
+/* ---------Config för loggan till mainmenyn/Navbar -------------------*/
+.navbaren {
+    display: flex;
+    justify-content:space-around; /* relativitet till varandra*/
+    align-items: center; /* Centraliserar texten relativt till loggan */
+}
+#navigeringsbar {
+    border: black 3px;
+    background-color:  #24252A;  
+}
+#navigeringsbar1 {
+    border: black 3px solid;
+    background-color:  #24222A;  
+}
+#navbar li{
+    display: inline-block;  /* sätter huvudmenyn efter varandra istället för ovanpå */
+    padding: 0px 25px;
+    align-content: center;
+}
+#navbar li a:hover {
+    color:darkcyan;
+}
+li, a{
+    font-family: "Montserrat", sans-serif;
+    font-size: 25px;
+    color: snow;
+    text-decoration: none;
+}
+/*Loggan*/
+.logo {
+    display: flex;
+    width:100px; /* Storleken på logo */
+    height:100px;
+}
+/*Dropdownmenyn*/
+.dropdown {
+    float: left;
+    overflow: hidden;
+}
+.dropdown .dropbtn {
+    font-size: 25px;  
+    border: black 2px;
+    color: white;
+    background-color: inherit;
+    font-family: "Montserrat", sans-serif;  
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    border: black 3px solid;  
+}
+.dropdown-content a {
+    float: none;
+    color: snow;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    background-color: #24252A;   
+}
+.dropdown-content a:hover {
+    color: darkcyan;
+}
+.dropdown:hover .dropdown-content {
+    display: block;  
+}
+
+
+/*-------------FOOTER-------------------*/
+footer {
+    background-color: #24252A;
+    text-align: center;
+    display: grid;
+    border: black 2px solid;
+    color: snow;
+    margin-top: 6%;
+    padding: 10px;
+}
+#footerSplit {
+    display:grid;
+    grid-template-columns: 50% 50%; 
+    font-family: "Montserrat", sans-serif;
+    position: absolute;
+    margin-top: 5px;
+    width: 98.5%;
+    height: 25px;
+    text-align: center;
+    color:snow;
+    font-size: 25px;
+}
+#footerSplit > div {
+    background-color:  #24252A;
+    color: snow;
+    font-family: "Montserrat", sans-serif;
+}
+#footerSplit > div:nth-child(even) {
+    background-color: #24222A;
+}
+
