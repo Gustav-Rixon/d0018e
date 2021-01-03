@@ -3,20 +3,60 @@
 	<head>
 	<meta charset="utf-8">
 		<title>{% block title %}{% endblock %}</title>
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
 	</head>
 
+<h1> Amazones </h1>
 	<body class="loggedin">
-		<nav class="navtop">
-			<div>
-				<h1>Website Title</h1>
-                <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
-				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
-				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
-				<a href="{{ url_for('shop') }}"><i class="fas fa-sign-out-alt"></i>Shop</a>
-			</div>
-		</nav>
-		<div class="content">
-			{% block content %}{% endblock %}
-		</div>
+
+<div id="navigeringsbar"> <!--Innehåller allt för Navigationsbaren/huvudmenyn-->
+    <div class="table">  
+        <header class="navbaren">   
+         <!---   <a href="index.html"><img class="logo" src="background.png" alt="logo"></a>  POTENTIELL LOGGA -->
+            <div class="DropDownen">
+                <ul id="navbar">
+                    <li><a href="/edde/home"><i class="fas fa-home"></i>Home</a></li>
+                    <li><a href="/edde/shop"><i class="fas fa-sign-out-alt"></i>Shop</a></li>
+                    <li><a href="/edde/profile"><i class="fas fa-user-circle"></i>Profile</a></li>
+		    <li><a href="/edde/cart"><i class="fas fa-sign-out-alt"></i>Cart</a></li>    
+		    <li><a href="/edde/vieworders"><i class="fas fa-sign-out-alt"></i>Orders</a></li>
+                    <li><a href="/edde/logout"><i class="fas fa-sign-out-alt"></i>Logout</a></li>        
+                </ul>
+            </div>
+        </header>
+    </div>
+</div>
+	
+   </form>
+  </div>
+
+
+
+<div class="content">
+	{% block content %}{% endblock %}
+</div>
+
+
+
+<footer>
+    <table >
+        <tr>
+            <th>Adress:</th>
+            <th>Postnummer:</th>
+            <th>Stad:</th>
+            <th>Land:</th>
+            <th>Gmail:</th>
+            <th>Telefon:</th>
+        </tr>
+        <tr>
+            <td>Kontorsgatan 35</td>
+            <td> 144 14</td>
+            <td>Stockholm</td>
+            <td>Sverige</td>
+            <td>Info@ReallyTheRealAmazones.scam</td>
+            <td>+46-795-1234</td>
+        </tr>
+    </table> 
+</footer>
 	</body>
 </html>

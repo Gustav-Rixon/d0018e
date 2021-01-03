@@ -1,0 +1,36 @@
+{% extends 'layoutAdmin.html' %}
+
+{% block title %}view{% endblock %}
+
+{% block content %}
+	<div id="orders">
+		<h2>Customer {{ userId.customer_id  }}  orders</h2>
+	</div>
+
+{% for item in data %}
+
+	<tr id="order_id">
+		<td>Your Order Id: {{ item.order_id }}</td>
+	</tr>
+
+	<br>
+
+	<tr id="prod_name">
+		<td>You orded {{  item.quantity  }}, {{ item.prod_name }} for {{  item.pris_fast  }} per unit</td>
+	</tr>
+	
+	<br>
+
+	<tr id="order_cost">
+		<td>Your Order cost is: {{ item.quantity * item.pris_fast }}</td>
+	</tr>
+
+	
+
+	<p>-----------------------------------------</p>
+	<br>
+
+{% endfor %}
+
+
+{% endblock %}

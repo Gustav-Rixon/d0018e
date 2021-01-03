@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/myStyles.css">
+	<div id="cartItems">
+		<h2>Shopping Cart Page</h2>
+	</div>
+{% for item in ordData %}
+
+	
+
+	<tr id="itemPic">
+		<td>
+		<img src={{ item.img_url }} id="itemImage" width="125" height="150" />
+		</td>
+		<br>
+	</tr>
+
+	<tr id="itemNmae">
+		<td>Name: {{ item.prod_name }}</td>
+		<br>
+	</tr>
+
+	<tr id="itemPrice">
+		<td>Price: {{ item.price }}</td>
+		<br>
+	</tr>
+
+
+	<div id="showQty">
+		<tb>Qty: {{ item.order_item_quantity  }}</tb>		
+	</div>
+
+
+	Your order ID: {{  item.order_item_id   }}
+
+	<h4>Change Qty</h4>
+	<div id={{  item.order_item_id   }}>
+		<form name=changeQty action="/gurx/changeQty?OrderId={{item.order_item_id}}" method="POST">
+			<label>Desired amount:</label>
+			<input type="text" name="amount" value={{  item.order_item_quantity  }}>
+
+			<input type="hidden" name="orderId" value={{  item.order_item_id  }}>
+
+			<input type="submit" value="submit">
+
+		</form>
+	</div>
+	
+	<a href="/gurx/removeFromCart?orderId={{ item.order_item_id }}">Remove</a>
+	<br>
+	<a href="/gurx/checkout?orderId={{  item.order_item_id  }}">Proceed to checkout</a>
+
+	<br>
+	<br>
+{% endfor %}
+{% endblock %}

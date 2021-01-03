@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title>Register</title>
+    <link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/myStyles.css">
   </head>
   <body>
 	<div class="register">
-	<h1>Register</h1>
+	<h1>Amazones</h1>
 	<div class="links">
 		<a href="{{ url_for('login') }}">Login</a>
 		<a href="{{ url_for('register') }}" class="active">Register</a>
@@ -15,11 +16,11 @@
 		<label for="first_name">
 			<i class="fas fa-user"></i>
 		</label>
-		<input type="text" name="first_name" placeholder="first_name" id="first_name" required>
+		<input type="text" name="first_name" placeholder="first name" id="first_name" required>
 		<label for="last_name">
 			<i class="fas fa-user"></i>
 		</label>
-		<input type="text" name="last_name" placeholder="last_name" id="last_name" required>
+		<input type="text" name="last_name" placeholder="last name" id="last_name" required>
 		<label for="password">
 			<i class="fas fa-lock"></i>
 		</label>

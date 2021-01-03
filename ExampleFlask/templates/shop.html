@@ -1,31 +1,25 @@
-<!DOCTYPE html>
-<html>
+{% extends 'layout.html' %}
 
-<head>
- <title>shop test</title> 
-</head>
+{% block title %}Shop{% endblock %}
 
-<body>
+{% block content %}
+<h2>Shop page</h2>
 
-<table border="1" cellpadding="5" cellspacing="5">
-    <thead>
-    <tr>
-        <th>prod_name</th>
-        <th>price(Dollares)</th>
-        <th>cat_id</th>
-    </tr>
-    </thead>
 
+<h2>Items</h2>
 <tbody>
-{% for item in data %}
-    <tr>
-        <td>{{ item.prod_name }}</td>
-        <td>{{ item.price }}</td>
-        <td>{{ item.categorie_id }}</td>
-    </tr>
+
+<!--<h1>{{ prodData }}</h1>-->
+
+{% for item in prodData %}
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/shopStyles.css">
+<div class="ree">
+			<a href="/edde/productDescription?productId={{item.prod_id}}"><img src={{ item.img_url }} id="itemImage" width="250" height="300" /></a>
+			<p>{{ item.prod_name }}:{{ item.price }}kr</p>
+			
+</div>
 {% endfor %}
 </tbody>
-</table>
 
-</body>
-</html>
+{% endblock %}
+

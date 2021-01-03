@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8">
+		<title>{% block title %}{% endblock %}</title>
+	</head>
+
+	<body class="loggedin">
+
+		<nav class="navtop">
+			<div>
+				<!-- Något skumt här -->
+				<h1>Amazones directors cut</h1>
+				<a href="{{ url_for('adminProducts') }}"><i class="fas fa-sign-out-alt"></i>adminProducts</a>
+				<a href="{{ url_for('viewCustomers') }}"><i class="fas fa-sign-out-alt"></i>viewCustomers</a>
+			</div>
+		</nav>
+		
+    </form>
+  </div>
+		<div class="content">
+			{% block content %}{% endblock %}
+		</div>
+
+	</body>
+</html>

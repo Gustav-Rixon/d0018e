@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %}productDescription{% endblock %}
+
+{% block content %}
+<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/shopStyles.css">
+<div id="display">
+
+	<div id="productName">
+		<h1>{{  data.prod_name  }}</h1>
+	</div>
+
+	<div>
+		<img src={{  data.img_url  }} id="productImage" width="250" height="300" />
+	</div>
+
+
+	<div id="productDescription">
+		<h2>Details</h2>
+		<p>{{ data.prod_name }}:{{ data.price}} kr</p>
+		<p>{{data2.stock}} units </p>
+		<h2>Description</h2>
+		<p>{{  data.prod_description  }}</p>
+
+
+		<h2>Comments</h2>
+		{% for item in data3 %}
+		<p>Rating: {{  item.rating  }}</p>
+		<p>Comment: {{  item.comment  }}</p>
+		<p>Date: {{  item.date  }}</p>
+		<p>---------------------------</p>
+		{% endfor %}
+
+
+	</div>
+
+
+	<h3>Give Feedback</h3>
+	<div id="feedback">
+		<form name=feedback action="/gurx/addComment?productId={{request.args.get('productId')}}" method="POST">
+		<label>Comment:</label>
+		<input type="text" name="comment">
+		<label>Grade:</label>
+		<select name="grade">
+		  	<option value="0">0</option>
+    			<option value="1">1</option>
+    			<option value="2">2</option>
+    			<option value="3">3</option>
+    			<option value="4">4</option>
+    			<option value="5">5</option>
+  		</select>
+	
+		<input type="hidden" name="data" value={{  data.prod_id  }}>
+
+		<input type="submit" value="submit">		
+	</div>
+
+	<div id="addToCart">
+		<a href="/gurx/addToCart?productId={{request.args.get('productId')}}">
+			<h1>Add to cart </h1>
+		</a>
+	</div>
+
+
+</div>
+{% endblock %}
