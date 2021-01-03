@@ -10,19 +10,19 @@
 {% for item in data %}
 
 	<tr id="order_id">
-		<td>Your Order Id: {{ item.order_id }}</td>
+		<td>Order Id: {{ item.order_id }}</td>
 	</tr>
 
 	<br>
 
 	<tr id="prod_name">
-		<td>You orded {{  item.quantity  }}, {{ item.prod_name }} for {{  item.pris_fast  }} per unit</td>
+		<td>Orded {{  item.quantity  }}, {{ item.prod_name }} for {{  item.pris_fast  }} per unit</td>
 	</tr>
 	
 	<br>
 
 	<tr id="order_cost">
-		<td>Your Order cost is: {{ item.quantity * item.pris_fast }}</td>
+		<td>Total  cost is: {{ item.quantity * item.pris_fast }}</td>
 	</tr>
 
 	

@@ -3,10 +3,6 @@
 {% block title %}product{% endblock %}
 
 {% block content %}
-<br>
-<a href="">++Add a product</a><br>
-<a href="">++Add a product category</a>
-<a href="">--Remove product category</a>
 
 <h2>Current products</h2>
 
@@ -17,24 +13,26 @@
 
 {% for item in prodData %}
 	<table>
+		<tr id="productName">
+			<td>Name {{ item.prod_name }}</td>
+		</tr>
 
 		<tr id="productName">
-			<td>{{ item.prod_name }}</td>
+			<td>ID {{ item.prod_id }}</td>
 		</tr>
 
 		<tr id="productPrice">
-			<td>{{ item.price }}</td>
+			<td>Price {{ item.price }}</td>
 		</tr>
 
 		<tr id="productImg">
-			<a href="/gurx/productDescriptionAdmin?productId={{item.prod_id}}">
+			<a href="/flask/productDescriptionAdmin?productId={{item.prod_id}}">
 				<img src={{ item.img_url }} id="itemImage" width="250" height="300" />
 			</a>
 		</tr>
 
 		<h2>Modifie product<h2>
 		<h2>remove product<h2>
-
 	</table>
 {% endfor %}
 </tbody>

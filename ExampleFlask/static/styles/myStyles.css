@@ -2,6 +2,14 @@
   text-align: center;
 }
 
+body {
+ background-color: #DCDCDC; 
+}
+
+#addToCart {
+ color: 000000;
+}
+
 #productName {
  text-align: center;
 }
@@ -19,7 +27,7 @@
 }
 
 .links a {
-  color: #a2b2c2;
+  color: black;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -27,6 +35,9 @@
 }
 
 .links a:hover {
-  color: black;
+  color: snow;
 }
 
+.topmargin {
+margin-top: 25px;
+}

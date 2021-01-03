@@ -4,6 +4,20 @@
  vertical-align: middle;
 }
 
+
 img {
-  border: 5px solid #555;
+  border: 3px solid #555;
+  background-color:white;
 }
+.colors {
+  color: grey !important;
+}
+
+@media (forced-colors: active) {
+  .colors {
+    background-color: black;
+    color: black;
+  }
+}
+
+

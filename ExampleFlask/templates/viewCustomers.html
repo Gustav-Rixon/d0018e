@@ -20,6 +20,10 @@
 		<h5>Email: {{  item.email  }}</h5>
 	</div>
 
+	<a href="/flask/viewCustomerOrder?customer={{item.email}}">
+			<p>View customer orders</p>
+	</a>
+
 	<h5>-------------------</h5>
 
 {% endfor %}

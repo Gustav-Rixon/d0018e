@@ -15,7 +15,7 @@
 <link rel= "stylesheet" type= "text/css" href= "/flask/static/styles/shopStyles.css">
 <div class="ree">
 			<a href="/flask/productDescription?productId={{item.prod_id}}"><img src={{ item.img_url }} id="itemImage" width="250" height="300" /></a>
-			<p>  &#9679; {{ item.prod_name }}:{{ item.price }}kr</p>
+			<p> &middot; item.prod_name }}:{{ item.price }}kr</p>
 			
 </div>
 {% endfor %}

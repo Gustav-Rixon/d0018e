@@ -106,17 +106,13 @@ def shop():
 
 @app.route('/cart')
 def cart():
-
 	if 'loggedin' not in session:
 		return redirect(url_for('login'))
 
 	else:
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
 		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 		cusData = cursor.fetchone()
-
-
 		cursor.execute('SELECT * FROM Products, Order_items, Orders WHERE customer_id = % s and order_item_id = order_id AND Order_items.prod_id = Products.prod_id', (cusData["customer_id"], ))
 		ordData = cursor.fetchall()
 
@@ -124,22 +120,15 @@ def cart():
 
 @app.route('/addToCart', methods =['GET', 'POST'])
 def addToCart():
-
 	if 'loggedin' not in session:
 		return redirect(url_for('login'))
 
 	else:
 		prod_id = request.args.get('productId')
 		quy = request.args.get('quantityId')
-
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
 		cursor.execute("SELECT customer_id FROM Customers WHERE email = '" + session['email'] + "'")
 		userId = cursor.fetchone()
-
-		print ('#################################################################################')
-		print (prod_id)
-		print ('#################################################################################')
 
 		cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
 		prodData = cursor.fetchone()
@@ -162,28 +151,22 @@ def addToCart():
 		except:
 			mysql.connection.rollback()
 			msg = "Error occured"
-	print ('#################################################################################')
-	print (msg)
-	print (prod_id)
-	print ('#################################################################################')
+
 	return redirect(url_for('cart'))
 
 @app.route("/removeFromCart")
 def removeFromCart():
-
 	if 'email' not in session:
         	return redirect(url_for('login'))
 
 	else:
 		orderId = request.args.get('orderId')
 		email = session['email']
-
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
 		try:
 			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
 			cursor.execute("DELETE FROM Orders WHERE order_id = % s", (orderId, ))
-
 			mysql.connection.commit()
 			msg = "Added successfully"
 
@@ -197,40 +180,12 @@ def removeFromCart():
 def productDescription():
 	prod_id = request.args.get('productId')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-	print ('################################')
-	print (prod_id)
-	print (type(prod_id))
-	print ('################################')
-
-
-	print ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-#	cursor.execute('SELECT * FROM Products WHERE prod_id = 27')
 	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id), )
 	productData = cursor.fetchone()
-	print ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-
-	print ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
-#	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = 27' )
 	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id), )
 	relOwnData = cursor.fetchone()
-	print ('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
-
-	print ('llllllllllllllllllllllllllllllllllllllllll')
-#	cursor.execute('SELECT * FROM Feedback WHERE prod_id = 27')
 	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
 	feedbackData = cursor.fetchall()
-	print ('llllllllllllllllllllllllllllllllllllllllll')
-
-
-
-	print ('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-	print (productData)
-	print (relOwnData)
-	print (feedbackData)
-	print ('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-
-
 
 	return render_template('productDescription.html', data = productData, data2 = relOwnData, data3 = feedbackData)
 
@@ -254,7 +209,6 @@ def checkout():
 
 			cursor.execute('SELECT price FROM Products WHERE prod_id = % s', (orderInfo["prod_id"], ))
 			proInfo = cursor.fetchone()
-
 			cursor.execute('UPDATE RelOwnProd SET stock = % s WHERE prod_id = % s', (newstock, orderInfo["prod_id"], ))
 			cursor.execute("DELETE FROM Order_items WHERE order_item_id = % s", (orderId, ))
 			cursor.execute("UPDATE Orders SET order_status = 1, pris_fast = % s, quantity = % s WHERE order_id = % s", (proInfo["price"], orderInfo["order_item_quantity"], orderInfo["order_item_id"], ))
@@ -273,17 +227,12 @@ def vieworders():
 		return redirect(url_for('login'))
 
 	else:
-
 		email = session['email']
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
 		userId = cursor.fetchone()
-
 		cursor.execute('SELECT Products.prod_name, Products.img_url, Products.prod_description, Orders.quantity, Orders.pris_fast, Orders.order_id, Orders.customer_id FROM Products, Orders WHERE order_status = 1 AND Orders.customer_id = % s AND Orders.prod_id = Products.prod_id', (userId["customer_id"], ))
 		data = cursor.fetchall()
-
-#	print (userId)
-#	print (data)
 
 	return render_template("vieworders.html", data=data)
 
@@ -298,12 +247,13 @@ def addComment():
 		grade = request.form['grade']
 		data = request.form['data']
 		today = date.today()
-
 		cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (session['email'],))
+		cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (email, ))
 		userId = cursor.fetchone()
 		try:
-			cursor.execute('INSERT INTO Feedback (prod_id, rating, comment, date, customer_id) VALUES (% s, % s, % s, % s, % s)', (data, grade, comment, today, userId["customer_id"], ))
+			sql = "INSERT INTO Feedback (prod_id, rating, comment, date, customer_id) VALUES (%s, %s, %s, %s, %s)"
+			val = (data, grade, comment, today, userId["customer_id"])
+			cursor.execute(sql, val)
 			mysql.connection.commit()
 			msg = 'Added successfully'
 
@@ -329,12 +279,9 @@ def changeQty():
 		mysql.connection.rollback()
 		msg = "Error occured"
 
-	print (ammount)
-	print (orderId)
-	print (msg)
 	return redirect(url_for('cart'))
 
-####Admin shitt is here########
+####Admin code is here########
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
@@ -373,14 +320,10 @@ def adminProducts():
 def productDescriptionAdmin():
 	prod_id = request.args.get('productId')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-
 	cursor.execute('SELECT * FROM Products WHERE prod_id = % s', (prod_id))
 	productData = cursor.fetchone()
-
 	cursor.execute('SELECT stock FROM RelOwnProd WHERE prod_id = % s', (prod_id))
 	relOwnData = cursor.fetchone()
-
 	cursor.execute('SELECT * FROM Feedback WHERE prod_id = % s', (prod_id))
 	feedbackData = cursor.fetchall()
 
@@ -391,19 +334,17 @@ def viewCustomers():
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 	cursor.execute('SELECT first_name, last_name, email FROM Customers WHERE owner_id = 1')
 	data = cursor.fetchall()
-	print (data)
+
 	return render_template('viewCustomers.html', data=data)
 
 @app.route("/addProduct", methods=['GET', 'POST'])
 def addProduct():
-
 	name = request.form['name']
 	price = request.form['price']
 	pic = request.form['pic']
 	category = request.form['category']
 	description = request.form['description']
 	stock = request.form['stock']
-
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
 	try:
@@ -424,7 +365,6 @@ def addProduct():
 @app.route("/removeProduct", methods=['GET', 'POST'])
 def removeProduct():
 	ID = request.form['ID']
-
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
 	try:
@@ -559,7 +499,6 @@ def changeName():
 
 @app.route("/viewCustomerOrder", methods=['GET', 'POST'])
 def viewCustomerOrder():
-
 	email = request.args.get('customer')
 	cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 	cursor.execute('SELECT customer_id FROM Customers WHERE email = % s', (email, ))
@@ -567,9 +506,6 @@ def viewCustomerOrder():
 
 	cursor.execute('SELECT Products.prod_name, Products.img_url, Products.prod_description, Orders.quantity, Orders.pris_fast, Orders.order_id, Orders.customer_id FROM Products, Orders WHERE order_status = 1 AND Orders.customer_id = % s AND Orders.prod_id = Products.prod_id', (userId["customer_id"], ))
 	data = cursor.fetchall()
-
-#	print (userId)
-#	print (data)
 
 	return render_template("viewordersAdmin.html", data=data, userId=userId)
 

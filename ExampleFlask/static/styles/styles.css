@@ -1,6 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
+  background-color:  #DCDCDC;
 }
 
 h1 {
@@ -18,13 +19,14 @@ p {
 
 /* ---------Config för loggan till mainmenyn/Navbar -------------------*/
 .navbaren {
+    border: black 3px solid;
     display: flex;
     justify-content:space-around; /* relativitet till varandra*/
     align-items: center; /* Centraliserar texten relativt till loggan */
 }
 #navigeringsbar {
     border: black 3px;
-    background-color:  #24252A;  
+    background-color:  #75816B;  
 }
 #navigeringsbar1 {
     border: black 3px solid;
@@ -35,13 +37,13 @@ p {
     padding: 0px 25px;
     align-content: center;
 }
-#navbar li a:hover {
-    color:darkcyan;
+ li, a:hover {
+    color: snow;
 }
-li, a{
+li, a {
     font-family: "Montserrat", sans-serif;
     font-size: 25px;
-    color: snow;
+    color: black;
     text-decoration: none;
 }
 /*Loggan*/
@@ -50,47 +52,14 @@ li, a{
     width:100px; /* Storleken på logo */
     height:100px;
 }
-/*Dropdownmenyn*/
-.dropdown {
-    float: left;
-    overflow: hidden;
-}
-.dropdown .dropbtn {
-    font-size: 25px;  
-    border: black 2px;
-    color: white;
-    background-color: inherit;
-    font-family: "Montserrat", sans-serif;  
-}
-.dropdown-content {
-    display: none;
-    position: absolute;
-    z-index: 1;
-    border: black 3px solid;  
-}
-.dropdown-content a {
-    float: none;
-    color: snow;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-    background-color: #24252A;   
-}
-.dropdown-content a:hover {
-    color: darkcyan;
-}
-.dropdown:hover .dropdown-content {
-    display: block;  
-}
-
 
 /*-------------FOOTER-------------------*/
 footer {
-    background-color: #24252A;
+    background-color: #75816B;
     text-align: center;
     display: grid;
     border: black 2px solid;
-    color: snow;
+    color: black;
     margin-top: 6%;
     padding: 10px;
 }

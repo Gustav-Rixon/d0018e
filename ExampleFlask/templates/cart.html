@@ -3,7 +3,8 @@
 {% block title %}Cart{% endblock %}
 
 {% block content %}
-<link rel= "stylesheet" type= "text/css" href= "/edde/static/styles/myStyles.css">
+
+<link rel= "stylesheet" type= "text/css" href= "/flask/static/styles/shopStyles.css">
 	<div id="cartItems">
 		<h2>Shopping Cart Page</h2>
 	</div>
@@ -38,7 +39,7 @@
 
 	<h4>Change Qty</h4>
 	<div id={{  item.order_item_id   }}>
-		<form name=changeQty action="/gurx/changeQty?OrderId={{item.order_item_id}}" method="POST">
+		<form name=changeQty action="/flask/changeQty?OrderId={{item.order_item_id}}" method="POST">
 			<label>Desired amount:</label>
 			<input type="text" name="amount" value={{  item.order_item_quantity  }}>
 
@@ -49,9 +50,9 @@
 		</form>
 	</div>
 	
-	<a href="/gurx/removeFromCart?orderId={{ item.order_item_id }}">Remove</a>
+	<a href="/flask/removeFromCart?orderId={{ item.order_item_id }}">  &#9679; Remove</a>
 	<br>
-	<a href="/gurx/checkout?orderId={{  item.order_item_id  }}">Proceed to checkout</a>
+	<a href="/flask/checkout?orderId={{  item.order_item_id  }}">  &#9679; Proceed to checkout</a>
 
 	<br>
 	<br>
